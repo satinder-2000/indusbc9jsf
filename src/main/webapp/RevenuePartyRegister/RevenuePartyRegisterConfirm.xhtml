@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                template="/WEB-INF/template/indusbcTemplate.xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <div class="w3-col m7">
+            <div class="w3-row-padding">
+                <div class="w3-col m12">
+                    <div class="w3-card w3-round w3-white">
+                    <div class="w3-container w3-padding">
+                        <h:form> 
+                        <h4 class="w3-margin-left">Revenue Party Registration - Confirm</h4>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:outputLabel for="name" value="Name" styleClass="w3-margin-left w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <h:outputText id="name" value="#{revenuePartyRegisterMBean.revenuePartyDto.name}" styleClass="w3-margin-bottom"/> 
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:outputLabel for="email" value="Email" styleClass="w3-margin-left w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <h:outputText id="email" value="#{revenuePartyRegisterMBean.revenuePartyDto.email}" styleClass="w3-margin-bottom"/> 
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:outputLabel for="orgn" value="Organisation" styleClass="w3-margin-left w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <h:outputText id="orgn" value="#{revenuePartyRegisterMBean.revenuePartyDto.organisation}" styleClass="w3-margin-bottom"/> 
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:outputLabel for="poIdDoc" value="Proof Of Id Document" styleClass="w3-margin-left w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <h:outputText id="poIdDoc" value="#{revenuePartyRegisterMBean.revenuePartyDto.proofOfIdDocument}" styleClass="w3-margin-bottom"/> 
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:outputLabel for="docId" value="Document Id" styleClass="w3-margin-left w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <h:outputText id="docId" value="#{revenuePartyRegisterMBean.revenuePartyDto.documentId}" styleClass="w3-margin-bottom"/> 
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:outputLabel for="expAccts" value="Expense Accounts" styleClass="w3-margin-left w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <ui:repeat value="#{revenuePartyRegisterMBean.revenuePartyDto.revenueAccounts}" var="rA" class="w3-margin-bottom">
+                                    <li><h:outputText value="#{rA}"/></li>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:outputLabel for="memDate" value="Memorable Date" styleClass="w3-margin-left w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <h:outputText id="memDate" value="#{revenuePartyRegisterMBean.revenuePartyDto.memorableDate}" styleClass="w3-margin-bottom"/> 
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <h:commandButton value="Amend" action="${revenuePartyRegisterMBean.amendRevenueParty()}" styleClass="w3-button w3-theme-d1 w3-margin-bottom"/>
+                            </div>
+                            <div class="w3-half">
+                                <h:commandButton value="Submit" action="returnFromRevenuePartyRegister" styleClass="w3-button w3-theme-d1 w3-margin-bottom"/>
+                            </div>
+                        </div>
+                        </h:form>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </ui:define>
+
+</ui:composition>
+

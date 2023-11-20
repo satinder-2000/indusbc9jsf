@@ -14,6 +14,7 @@ public class ExpenseAccount {
     private ObjectId expensePartyId;
     private String expenseAccountHash;
     private Date createdOn;
+    private String ytdBalance;
 
     public ObjectId getId() {
         return _id;
@@ -53,6 +54,14 @@ public class ExpenseAccount {
 
     public void setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public String getYtdBalance() {
+        return ytdBalance;
+    }
+
+    public void setYtdBalance(String ytdBalance) {
+        this.ytdBalance = ytdBalance;
     }
     
     

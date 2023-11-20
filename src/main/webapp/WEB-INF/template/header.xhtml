@@ -8,10 +8,14 @@
  <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
   <h:outputLink target="#{request.contextPath}" styleClass="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2"></h:outputLink>   
   <a href="#" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Logo</a>
+  <h:outputLink value="#{request.contextPath}/Login.xhtml" styleClass="w3-bar-item w3-button w3-padding-large w3-theme-d4">Log In</h:outputLink>   
+  <h:form>
+      <h:commandLink value="Logout" action="#{logoutMBean.logout()}" styleClass="w3-bar-item w3-button w3-padding-large w3-theme-d4">
+      </h:commandLink>
+  </h:form>
   <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="News"><i class="fa fa-globe"></i></a>
   <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Account Settings"><i class="fa fa-user"></i></a>
   <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Messages"><i class="fa fa-envelope"></i></a>
-  <h:outputLink target="#{request.contextPath}/Login.xhtml" styleClass="w3-bar-item w3-button w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" value="Log in">Log In</h:outputLink>   
   
   <div class="w3-dropdown-hover w3-hide-small">
     <button class="w3-button w3-padding-large" title="Register">Register</button>     

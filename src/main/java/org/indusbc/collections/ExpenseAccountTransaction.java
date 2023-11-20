@@ -11,6 +11,7 @@ public class ExpenseAccountTransaction {
     
     private ObjectId _id;
     private ObjectId expenseAccountId;
+    private ObjectId expensePartyId;
     private int year;
     private String moneyIn;
     private String moneyOut;
@@ -33,6 +34,14 @@ public class ExpenseAccountTransaction {
         this.expenseAccountId = expenseAccountId;
     }
 
+    public ObjectId getExpensePartyId() {
+        return expensePartyId;
+    }
+
+    public void setExpensePartyId(ObjectId expensePartyId) {
+        this.expensePartyId = expensePartyId;
+    }
+    
     public int getYear() {
         return year;
     }

@@ -10,6 +10,53 @@
                     <div class="w3-card w3-round w3-white">
                     <div class="w3-container w3-padding">
                         <h4 class="w3-margin-left">Home - Expense Party</h4>
+                        <p>Select from your Accounts below for further actions.</p>
+                        <div class="w3-container w3-display-container w3-round w3-theme-l4 w3-border w3-theme-border w3-margin-bottom w3-hide-small">
+                    <span onclick="this.parentElement.style.display = 'none'" class="w3-button w3-theme-l3 w3-display-topright">
+                        <i class="fa fa-remove"></i>
+                    </span>
+                    <p><strong>Warning!</strong></p>
+                    <p>Max limit for Money Out is YTD Balance</p>
+                </div>
+                        <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <div class="w3-half">
+                                 A/C Name   
+                                </div>
+                                <div class="w3-half">
+                                 YTD Balance   
+                                </div>
+                            </div>
+                            <div class="w3-half">
+                                <div class="w3-half">
+                                  Money In  
+                                </div>
+                                <div class="w3-half">
+                                  Money Out  
+                                </div>
+                            </div>
+                        </div>
+                        <ui:repeat value="#{expenseAccountsActionsMBean.partyExpenseAccounts}" var="ea">
+                            <div class="w3-row-padding" style="margin:0 -16px">
+                            <div class="w3-half">
+                                <div class="w3-half">
+                                 #{ea.name}   
+                                </div>
+                                <div class="w3-half">
+                                 #{ea.name}   
+                                </div>
+                            </div>
+                            <div class="w3-half">
+                                <div class="w3-half">
+                                  Money In  
+                                </div>
+                                <div class="w3-half">
+                                  Money Out  
+                                </div>
+                            </div>
+                        </div>
+                        
+                        </ui:repeat>
                     </div>
                     </div>
                 </div>

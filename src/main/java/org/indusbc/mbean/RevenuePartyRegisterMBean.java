@@ -157,6 +157,7 @@ public class RevenuePartyRegisterMBean implements Serializable {
             ra.setRevenuePartyId(revenuePartyIdResult.getInsertedId().asObjectId().getValue());
             ra.setRevenueAccountHash(HashGenerator.generateHash(revenuePartyDto.getEmail()+revAcct));
             ra.setCreatedOn(new Date());
+            ra.setYtdBalance("0");
             partyRevenueAccounts.add(ra);
         }
         InsertManyResult revenueAccountsIdResult = revenueAccountColl.insertMany(partyRevenueAccounts);

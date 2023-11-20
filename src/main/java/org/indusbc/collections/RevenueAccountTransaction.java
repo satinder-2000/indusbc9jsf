@@ -11,6 +11,7 @@ public class RevenueAccountTransaction {
     
     private ObjectId _id;
     private ObjectId revenueAccountId;
+    private ObjectId revenuePartyId;
     private int year;
     private String moneyIn;
     private String moneyOut;
@@ -33,6 +34,14 @@ public class RevenueAccountTransaction {
         this.revenueAccountId = revenueAccountId;
     }
 
+    public ObjectId getRevenuePartyId() {
+        return revenuePartyId;
+    }
+
+    public void setRevenuePartyId(ObjectId revenuePartyId) {
+        this.revenuePartyId = revenuePartyId;
+    }
+    
     public int getYear() {
         return year;
     }

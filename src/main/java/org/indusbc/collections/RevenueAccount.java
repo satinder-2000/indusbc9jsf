@@ -14,6 +14,7 @@ public class RevenueAccount {
     private ObjectId revenuePartyId;
     private String revenueAccountHash;
     private Date createdOn;
+    private String ytdBalance;
 
     public ObjectId getId() {
         return _id;
@@ -53,6 +54,14 @@ public class RevenueAccount {
 
     public void setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public String getYtdBalance() {
+        return ytdBalance;
+    }
+
+    public void setYtdBalance(String ytdBalance) {
+        this.ytdBalance = ytdBalance;
     }
     
     

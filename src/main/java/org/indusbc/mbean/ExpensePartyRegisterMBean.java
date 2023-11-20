@@ -154,6 +154,7 @@ public class ExpensePartyRegisterMBean implements Serializable{
             ea.setExpensePartyId(expensePartyIdResult.getInsertedId().asObjectId().getValue());
             ea.setExpenseAccountHash(HashGenerator.generateHash(expensePartyDto.getEmail()+expAcct));
             ea.setCreatedOn(new Date());
+            ea.setYtdBalance("0");
             partyExpenseAccounts.add(ea);
         }
         InsertManyResult expenseAccountsIdResult = expenseAccountColl.insertMany(partyExpenseAccounts);

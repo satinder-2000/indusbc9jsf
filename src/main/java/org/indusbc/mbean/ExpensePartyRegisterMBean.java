@@ -114,33 +114,32 @@ public class ExpensePartyRegisterMBean implements Serializable{
         }else{
             return "ExpensePartyRegisterConfirm?faces-redirect=true";
         }
-      
-
     }
     
-    public String getReturnValue(){
-        submitExpenseParty();
-        return "/flowreturns/ExpensePartyRegister-return?faces-redirect=true";
+    public String amendExpenseParty(){
+        return "ExpensePartyRegisterAmend?faces-redirect=true";
     }
     
-     private void submitExpenseParty() {
+    
+    
+    private void submitExpenseParty() {
         //Prepare the ExpenseParty Document first from the Dto
-         ExpenseParty expenseParty=new ExpenseParty();
-         expenseParty.setName(expensePartyDto.getName());
-         expenseParty.setEmail(expensePartyDto.getEmail());
-         expenseParty.setOrganisation(expensePartyDto.getOrganisation());
-         expenseParty.setProofOfIdDocument(expensePartyDto.getProofOfIdDocument());
-         expenseParty.setDocumentId(expensePartyDto.getDocumentId());
-         StringBuilder partyHashSb=new StringBuilder(expensePartyDto.getName()).append(expensePartyDto.getEmail()).append(expensePartyDto.getDocumentId());
-         String partyHash=HashGenerator.generateHash(partyHashSb.toString());
-         expenseParty.setPartyHash(partyHash);
-         //Submit the EXpenseParty and get its ID
-         FacesContext facesContext=FacesContext.getCurrentInstance();
-        ServletContext servletContext= (ServletContext) facesContext.getExternalContext().getContext();
-        MongoClient mongoClient = (MongoClient)servletContext.getAttribute("mongoClient");
+        ExpenseParty expenseParty = new ExpenseParty();
+        expenseParty.setName(expensePartyDto.getName());
+        expenseParty.setEmail(expensePartyDto.getEmail());
+        expenseParty.setOrganisation(expensePartyDto.getOrganisation());
+        expenseParty.setProofOfIdDocument(expensePartyDto.getProofOfIdDocument());
+        expenseParty.setDocumentId(expensePartyDto.getDocumentId());
+        StringBuilder partyHashSb = new StringBuilder(expensePartyDto.getName()).append(expensePartyDto.getEmail()).append(expensePartyDto.getDocumentId());
+        String partyHash = HashGenerator.generateHash(partyHashSb.toString());
+        expenseParty.setPartyHash(partyHash);
+        //Submit the EXpenseParty and get its ID
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
+        MongoClient mongoClient = (MongoClient) servletContext.getAttribute("mongoClient");
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
-        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),fromProviders(pojoCodecProvider));
-        MongoDatabase mongoDatabase=mongoClient.getDatabase(servletContext.getInitParameter("MONGODB_DB")).withCodecRegistry(pojoCodecRegistry);
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(servletContext.getInitParameter("MONGODB_DB")).withCodecRegistry(pojoCodecRegistry);
         MongoCollection<ExpenseParty> expensePartyColl = mongoDatabase.getCollection("ExpenseParty", ExpenseParty.class);
         InsertOneResult expensePartyIdResult = expensePartyColl.insertOne(expenseParty);
         LOGGER.info(String.format("ExpenseParty created with Id of %s", expensePartyIdResult.getInsertedId()));
@@ -148,25 +147,24 @@ public class ExpensePartyRegisterMBean implements Serializable{
         //Create Expense Account(s) now
         List<ExpenseAccount> partyExpenseAccounts = new ArrayList<>();
         MongoCollection<ExpenseAccount> expenseAccountColl = mongoDatabase.getCollection("ExpenseAccount", ExpenseAccount.class);
-        for(String expAcct : expensePartyDto.getExpenseAccounts()){
+        for (String expAcct : expensePartyDto.getExpenseAccounts()) {
             ExpenseAccount ea = new ExpenseAccount();
             ea.setName(expAcct);
             ea.setExpensePartyId(expensePartyIdResult.getInsertedId().asObjectId().getValue());
-            ea.setExpenseAccountHash(HashGenerator.generateHash(expensePartyDto.getEmail()+expAcct));
+            ea.setExpenseAccountHash(HashGenerator.generateHash(expensePartyDto.getEmail() + expAcct));
             ea.setCreatedOn(new Date());
             ea.setYtdBalance("0");
             partyExpenseAccounts.add(ea);
         }
         InsertManyResult expenseAccountsIdResult = expenseAccountColl.insertMany(partyExpenseAccounts);
-        Map<Integer, BsonValue> expenseAccountsIdMap=expenseAccountsIdResult.getInsertedIds();
+        Map<Integer, BsonValue> expenseAccountsIdMap = expenseAccountsIdResult.getInsertedIds();
         Set<Integer> keySet = expenseAccountsIdMap.keySet();
-        for (Integer key: keySet){
+        for (Integer key : keySet) {
             BsonValue bsonValue = expenseAccountsIdMap.get(key);
             LOGGER.info(String.format("ExpenseAccount created with Id of %s", bsonValue));
-            //bsonValue.asObjectId().getValue();
         }
         //Next, we need to persist Access
-        Access access =new Access();
+        Access access = new Access();
         access.setEmail(expensePartyDto.getEmail());
         access.setPassword("");
         access.setAccessType(AccessType.ExpenseParty.toString());
@@ -174,11 +172,16 @@ public class ExpensePartyRegisterMBean implements Serializable{
         access.setLastAccessedOn(new Date());
         access.setFailedAttempts(0);
         MongoCollection<Access> accessColl = mongoDatabase.getCollection("Access", Access.class);
-        InsertOneResult accessIdResult=accessColl.insertOne(access);
+        InsertOneResult accessIdResult = accessColl.insertOne(access);
         LOGGER.info(String.format("Access created with Id of %s", accessIdResult.getInsertedId()));
         //And finally send email to the Party
         
          
+    }
+    
+    public String getReturnValue(){
+        submitExpenseParty();
+        return "/flowreturns/ExpensePartyRegister-return?faces-redirect=true";
     }
 
     public List<ProofOfIdDocument> getProofOfIdDocList() {

@@ -12,7 +12,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.flow.FlowScoped;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.ServletContext;
 import java.io.Serializable;
@@ -34,9 +33,6 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.indusbc.collections.Access;
-import org.indusbc.collections.ExpenseAccount;
-import org.indusbc.collections.ExpenseCategory;
-import org.indusbc.collections.ExpenseParty;
 import org.indusbc.collections.ProofOfIdDocument;
 import org.indusbc.collections.RevenueAccount;
 import org.indusbc.collections.RevenueCategory;
@@ -127,23 +123,23 @@ public class RevenuePartyRegisterMBean implements Serializable {
     
     
     private void submitRevenueParty(){
-        //Prepare the ExpenseParty Document first from the Dto
-        RevenueParty revenueParty=new RevenueParty();
+        //Prepare the RevenueParty Document first from the Dto
+        RevenueParty revenueParty = new RevenueParty();
         revenueParty.setName(revenuePartyDto.getName());
         revenueParty.setEmail(revenuePartyDto.getEmail());
         revenueParty.setOrganisation(revenuePartyDto.getOrganisation());
         revenueParty.setProofOfIdDocument(revenuePartyDto.getProofOfIdDocument());
         revenueParty.setDocumentId(revenuePartyDto.getDocumentId());
-         StringBuilder partyHashSb=new StringBuilder(revenuePartyDto.getName()).append(revenuePartyDto.getEmail()).append(revenuePartyDto.getDocumentId());
-         String partyHash=HashGenerator.generateHash(partyHashSb.toString());
-         revenueParty.setPartyHash(partyHash);
-         //Submit the EXpenseParty and get its ID
-         FacesContext facesContext=FacesContext.getCurrentInstance();
-        ServletContext servletContext= (ServletContext) facesContext.getExternalContext().getContext();
-        MongoClient mongoClient = (MongoClient)servletContext.getAttribute("mongoClient");
+        StringBuilder partyHashSb = new StringBuilder(revenuePartyDto.getName()).append(revenuePartyDto.getEmail()).append(revenuePartyDto.getDocumentId());
+        String partyHash = HashGenerator.generateHash(partyHashSb.toString());
+        revenueParty.setPartyHash(partyHash);
+        //Submit the RevenueParty and get its ID
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
+        MongoClient mongoClient = (MongoClient) servletContext.getAttribute("mongoClient");
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
-        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),fromProviders(pojoCodecProvider));
-        MongoDatabase mongoDatabase=mongoClient.getDatabase(servletContext.getInitParameter("MONGODB_DB")).withCodecRegistry(pojoCodecRegistry);
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(servletContext.getInitParameter("MONGODB_DB")).withCodecRegistry(pojoCodecRegistry);
         MongoCollection<RevenueParty> revenuePartyColl = mongoDatabase.getCollection("RevenueParty", RevenueParty.class);
         InsertOneResult revenuePartyIdResult = revenuePartyColl.insertOne(revenueParty);
         LOGGER.info(String.format("ExpenseParty created with Id of %s", revenuePartyIdResult.getInsertedId()));
@@ -151,25 +147,24 @@ public class RevenuePartyRegisterMBean implements Serializable {
         //Create Revenue Account(s) now
         List<RevenueAccount> partyRevenueAccounts = new ArrayList<>();
         MongoCollection<RevenueAccount> revenueAccountColl = mongoDatabase.getCollection("RevenueAccount", RevenueAccount.class);
-        for(String revAcct : revenuePartyDto.getRevenueAccounts()){
+        for (String revAcct : revenuePartyDto.getRevenueAccounts()) {
             RevenueAccount ra = new RevenueAccount();
             ra.setName(revAcct);
             ra.setRevenuePartyId(revenuePartyIdResult.getInsertedId().asObjectId().getValue());
-            ra.setRevenueAccountHash(HashGenerator.generateHash(revenuePartyDto.getEmail()+revAcct));
+            ra.setRevenueAccountHash(HashGenerator.generateHash(revenuePartyDto.getEmail() + revAcct));
             ra.setCreatedOn(new Date());
             ra.setYtdBalance("0");
             partyRevenueAccounts.add(ra);
         }
         InsertManyResult revenueAccountsIdResult = revenueAccountColl.insertMany(partyRevenueAccounts);
-        Map<Integer, BsonValue> revenueAccountsIdMap=revenueAccountsIdResult.getInsertedIds();
+        Map<Integer, BsonValue> revenueAccountsIdMap = revenueAccountsIdResult.getInsertedIds();
         Set<Integer> keySet = revenueAccountsIdMap.keySet();
-        for (Integer key: keySet){
+        for (Integer key : keySet) {
             BsonValue bsonValue = revenueAccountsIdMap.get(key);
             LOGGER.info(String.format("RevenueAccount created with Id of %s", bsonValue));
-            //bsonValue.asObjectId().getValue();
         }
         //Next, we need to persist Access
-        Access access =new Access();
+        Access access = new Access();
         access.setEmail(revenuePartyDto.getEmail());
         access.setPassword("");
         access.setAccessType(AccessType.RevenueParty.toString());
@@ -177,7 +172,7 @@ public class RevenuePartyRegisterMBean implements Serializable {
         access.setLastAccessedOn(new Date());
         access.setFailedAttempts(0);
         MongoCollection<Access> accessColl = mongoDatabase.getCollection("Access", Access.class);
-        InsertOneResult accessIdResult=accessColl.insertOne(access);
+        InsertOneResult accessIdResult = accessColl.insertOne(access);
         LOGGER.info(String.format("Access created with Id of %s", accessIdResult.getInsertedId()));
         //And finally send email to the Party
     }

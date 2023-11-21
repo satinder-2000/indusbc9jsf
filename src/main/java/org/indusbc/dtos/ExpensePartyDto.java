@@ -15,7 +15,6 @@ public class ExpensePartyDto {
     @Size(min = 2, max = 90, message = "Name must be 2-90 chars long")
     private String name;
     @NotBlank
-    //@Email(regexp ="^(.+)@(.+)$" ,message = "Invalid Email")
     @Email
     private String email;
     @NotBlank
@@ -28,7 +27,6 @@ public class ExpensePartyDto {
     private String[] expenseAccounts;
     @NotBlank
     private String memorableDate;
-    private String expenseAccountsStr;
     private String partyHash;
 
     public String getName() {
@@ -85,14 +83,6 @@ public class ExpensePartyDto {
 
     public void setMemorableDate(String memorableDate) {
         this.memorableDate = memorableDate;
-    }
-
-    public String getExpenseAccountsStr() {
-        return expenseAccountsStr;
-    }
-
-    public void setExpenseAccountsStr(String expenseAccountsStr) {
-        this.expenseAccountsStr = expenseAccountsStr;
     }
 
     public String getPartyHash() {

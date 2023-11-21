@@ -23,5 +23,33 @@
               xmlns="https://jakarta.ee/xml/ns/jakartaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_3_0.xsd">
-
+              
+    <navigation-rule>
+        <from-view-id>/home/ExpensePartyHome.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>/indusbc9jsf/trans/ExpenseAccountTransactions</from-outcome>
+            <to-view-id>/trans/ExpenseAccountTransactions.xhtml?faces-redirect=true</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/home/ExpensePartyHome.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>/indusbc9jsf/pmts/MoveMoneyExpenseAccount</from-outcome>
+            <to-view-id>/pmts/MoveMoneyExpenseAccount.xhtml?faces-redirect=true</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/home/RevenuePartyHome.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>/indusbc9jsf/trans/RevenueAccountTransactions</from-outcome>
+            <to-view-id>/trans/RevenueAccountTransactions.xhtml?faces-redirect=true</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/home/RevenuePartyHome.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>/indusbc9jsf/pmts/MoveMoneyRevenueAccount</from-outcome>
+            <to-view-id>/pmts/MoveMoneyRevenueAccount.xhtml?faces-redirect=true</to-view-id>
+        </navigation-case>
+    </navigation-rule>
 </faces-config>

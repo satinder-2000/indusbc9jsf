@@ -14,7 +14,7 @@ public class RevenueAccount {
     private ObjectId revenuePartyId;
     private String revenueAccountHash;
     private Date createdOn;
-    private String ytdBalance;
+    private String ytdBalance="0.0";
 
     public ObjectId getId() {
         return _id;

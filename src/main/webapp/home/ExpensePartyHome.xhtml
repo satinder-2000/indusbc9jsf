@@ -1,68 +1,71 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                template="/WEB-INF/template/indusbcTemplate.xhtml">
+                template="/WEB-INF/template/indusbcTemplate.xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
 
     <ui:define name="content">
         <div class="w3-col m7">
             <div class="w3-row-padding">
                 <div class="w3-col m12">
                     <div class="w3-card w3-round w3-white">
-                    <div class="w3-container w3-padding">
-                        <h4 class="w3-margin-left">Home - Expense Party</h4>
-                        <p>Select from your Accounts below for further actions.</p>
-                        <div class="w3-container w3-display-container w3-round w3-theme-l4 w3-border w3-theme-border w3-margin-bottom w3-hide-small">
-                    <span onclick="this.parentElement.style.display = 'none'" class="w3-button w3-theme-l3 w3-display-topright">
-                        <i class="fa fa-remove"></i>
-                    </span>
-                    <p><strong>Warning!</strong></p>
-                    <p>Max limit for Money Out is YTD Balance</p>
-                </div>
-                        <div class="w3-row-padding" style="margin:0 -16px">
-                            <div class="w3-half">
-                                <div class="w3-half">
-                                 A/C Name   
-                                </div>
-                                <div class="w3-half">
-                                 YTD Balance   
-                                </div>
+                        <div class="w3-container w3-padding">
+                            <h4 class="w3-margin-left">Home - Expense Party</h4>
+                            <p>Select from your Accounts below for further actions.</p>
+                            <div class="w3-container w3-display-container w3-round w3-theme-l4 w3-border w3-theme-border w3-margin-bottom w3-hide-small">
+                                <span onclick="this.parentElement.style.display = 'none'" class="w3-button w3-theme-l3 w3-display-topright">
+                                    <i class="fa fa-remove"></i>
+                                </span>
+                                <p><strong>Warning!</strong></p>
+                                <p>Max limit for Money Out is YTD Balance</p>
                             </div>
-                            <div class="w3-half">
-                                <div class="w3-half">
-                                  Money In  
-                                </div>
-                                <div class="w3-half">
-                                  Money Out  
-                                </div>
-                            </div>
-                        </div>
-                        <ui:repeat value="#{expenseAccountsActionsMBean.partyExpenseAccounts}" var="ea">
                             <div class="w3-row-padding" style="margin:0 -16px">
-                            <div class="w3-half">
                                 <div class="w3-half">
-                                 #{ea.name}   
+                                    <div class="w3-half">
+                                        Account Name
+                                    </div>
+                                    <div class="w3-half">
+                                        YTD Balance
+                                    </div>
                                 </div>
                                 <div class="w3-half">
-                                 #{ea.name}   
+                                    <div class="w3-half">
+                                        
+                                    </div>
+                                    <div class="w3-half">
+                                        
+                                    </div>
                                 </div>
                             </div>
-                            <div class="w3-half">
-                                <div class="w3-half">
-                                  Money In  
+                            <ui:repeat value="#{expenseAccountsActionsMBean.partyExpenseAccounts}" var="ea">
+                                <div class="w3-row-padding" style="margin:0 -16px">
+                                    <div class="w3-half">
+                                        <div class="w3-half">
+                                            #{ea.name}   
+                                        </div>
+                                        <div class="w3-half">
+                                            #{ea.ytdBalance}  
+                                        </div>
+                                    </div>
+                                    <div class="w3-half">
+                                        <div class="w3-half">
+                                            <h:link value="Move Money" outcome="#{request.contextPath}/pmts/MoveMoneyExpenseAccount">
+                                                <f:param name="accountId" value="#{ea.id}"/>
+                                            </h:link>   
+                                        </div>
+                                        <div class="w3-half">
+                                            <h:link value="View Transactions" outcome="#{request.contextPath}/trans/ExpenseAccountTransactions">
+                                                <f:param name="accountId" value="#{ea.id}"/>
+                                            </h:link>   
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="w3-half">
-                                  Money Out  
-                                </div>
-                            </div>
+                            </ui:repeat>
                         </div>
-                        
-                        </ui:repeat>
-                    </div>
                     </div>
                 </div>
             </div>
         </div>
     </ui:define>
-
 </ui:composition>
 

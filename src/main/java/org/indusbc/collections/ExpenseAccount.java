@@ -11,6 +11,9 @@ public class ExpenseAccount {
     
     private ObjectId _id;
     private String name;
+    private int year;
+    private ObjectId expenseCategoryId;
+    private String expenseCategory;
     private ObjectId expensePartyId;
     private String expenseAccountHash;
     private Date createdOn;
@@ -31,6 +34,31 @@ public class ExpenseAccount {
     public void setName(String name) {
         this.name = name;
     }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public ObjectId getExpenseCategoryId() {
+        return expenseCategoryId;
+    }
+
+    public void setExpenseCategoryId(ObjectId expenseCategoryId) {
+        this.expenseCategoryId = expenseCategoryId;
+    }
+
+    public String getExpenseCategory() {
+        return expenseCategory;
+    }
+
+    public void setExpenseCategory(String expenseCategory) {
+        this.expenseCategory = expenseCategory;
+    }
+    
 
     public ObjectId getExpensePartyId() {
         return expensePartyId;

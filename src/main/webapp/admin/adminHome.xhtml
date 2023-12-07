@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/adminTemplate.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <ui:define name="content">
+        <div class="container col-sm-8">
+            <div class="row">
+                <h:outputLink value="${request.contextPath}/admin/revenueCategorySetup.xhtml">Revenue Category Setup</h:outputLink>
+            </div>
+            <br/>
+            <div class="row">
+                <h:outputLink value="${request.contextPath}/admin/expenseCategorySetup.xhtml">Expense Category Setup</h:outputLink>
+            </div>
+            <br/>
+            <div class="row">
+                <h:outputLink value="${request.contextPath}/admin/revenueAllocationSetup.xhtml">Revenue Allocation Setup</h:outputLink>
+            </div>
+            <br/>
+            <div class="row">
+                <h:outputLink value="${request.contextPath}/admin/expenseAllocationSetup.xhtml">Expense Allocation Setup</h:outputLink>
+            </div>
+            <br/>
+            <div class="row">
+                <h:outputLink value="${request.contextPath}/admin/allocation.xhtml">Perform Allocations</h:outputLink>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

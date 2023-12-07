@@ -44,9 +44,9 @@ public class LoginMBean implements Serializable {
         HttpServletRequest request = (HttpServletRequest)facesContext.getExternalContext().getRequest();
         HttpSession session = request.getSession(true);
         session.setAttribute("access", access);
-        if(access.getAccessType().equals(AccessType.ExpenseParty.toString())){
+        if(access.getAccessType().equals(AccessType.EXPENSE_PARTY.getShortName())){
             toReturn = "/home/ExpensePartyHome?faces-redirect=true";
-        }else if(access.getAccessType().equals(AccessType.RevenueParty.toString())){
+        }else if(access.getAccessType().equals(AccessType.REVENUE_PARTY.getShortName())){
             toReturn = "/home/RevenuePartyHome?faces-redirect=true";
         } 
         return toReturn;

@@ -12,6 +12,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.flow.FlowScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.ServletContext;
 import java.io.Serializable;
@@ -41,6 +42,7 @@ import org.indusbc.dtos.RevenuePartyDto;
 import org.indusbc.util.AccessType;
 import org.indusbc.util.FinancialYear;
 import org.indusbc.util.HashGenerator;
+import org.indusbc.ejbs.EmailEjbLocal;
 
 /**
  *
@@ -54,6 +56,12 @@ public class RevenuePartyRegisterMBean implements Serializable {
     private RevenuePartyDto revenuePartyDto;
     private List<ProofOfIdDocument> proofOfIdDocList;
     private List<RevenueCategory> revenueCategoryList;
+    
+    @Inject
+    EmailEjbLocal emailEjbLocal;
+
+    public RevenuePartyRegisterMBean() {
+    }
     
     @PostConstruct
     public void init(){
@@ -150,8 +158,10 @@ public class RevenuePartyRegisterMBean implements Serializable {
         for (String revAcct : revenuePartyDto.getRevenueAccounts()) {
             RevenueAccount ra = new RevenueAccount();
             ra.setName(revAcct);
+            ra.setRevenueCategory(revAcct);
             ra.setRevenuePartyId(revenuePartyIdResult.getInsertedId().asObjectId().getValue());
             ra.setRevenueAccountHash(HashGenerator.generateHash(revenuePartyDto.getEmail() + revAcct));
+            ra.setYear(FinancialYear.financialYear());
             ra.setCreatedOn(new Date());
             ra.setYtdBalance("0");
             partyRevenueAccounts.add(ra);
@@ -167,7 +177,7 @@ public class RevenuePartyRegisterMBean implements Serializable {
         Access access = new Access();
         access.setEmail(revenuePartyDto.getEmail());
         access.setPassword("");
-        access.setAccessType(AccessType.RevenueParty.toString());
+        access.setAccessType(AccessType.REVENUE_PARTY.getShortName());
         access.setPartyId(revenuePartyIdResult.getInsertedId().asObjectId().getValue());
         access.setLastAccessedOn(new Date());
         access.setFailedAttempts(0);
@@ -175,6 +185,16 @@ public class RevenuePartyRegisterMBean implements Serializable {
         InsertOneResult accessIdResult = accessColl.insertOne(access);
         LOGGER.info(String.format("Access created with Id of %s", accessIdResult.getInsertedId()));
         //And finally send email to the Party
+        sendEmail(access);
+    }
+    
+    private void sendEmail(Access access){
+        try{
+            emailEjbLocal.sendEmail(access);
+            System.out.println("Email sent successfully!!");
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
     
     public String getReturnValue(){

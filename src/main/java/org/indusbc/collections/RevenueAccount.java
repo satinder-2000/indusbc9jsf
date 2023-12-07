@@ -11,6 +11,9 @@ public class RevenueAccount {
     
     private ObjectId _id;
     private String name;
+    private int year;
+    private ObjectId revenueCategoryId;
+    private String revenueCategory;
     private ObjectId revenuePartyId;
     private String revenueAccountHash;
     private Date createdOn;
@@ -32,6 +35,31 @@ public class RevenueAccount {
         this.name = name;
     }
 
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public ObjectId getRevenueCategoryId() {
+        return revenueCategoryId;
+    }
+
+    public void setRevenueCategoryId(ObjectId revenueCategoryId) {
+        this.revenueCategoryId = revenueCategoryId;
+    }
+
+    public String getRevenueCategory() {
+        return revenueCategory;
+    }
+
+    public void setRevenueCategory(String revenueCategory) {
+        this.revenueCategory = revenueCategory;
+    }
+    
+    
     public ObjectId getRevenuePartyId() {
         return revenuePartyId;
     }

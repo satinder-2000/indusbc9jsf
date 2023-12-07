@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/adminTemplate.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <ui:define name="content">
+        <div class="container col-sm-8">
+            <h2>Upload Revenue Allocations</h2>
+            <h:form enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h:outputLabel for="year" value="Year"/>
+                    </div>
+                    <div class="col-sm-5">
+                        <h:inputText id="year" value="${revenueAllocationAdminMBean.year}"/>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h:outputLabel for="file" value="Revenue Allocations File"/>
+                    </div>
+                    <div class="col-sm-5">
+                        <h:inputFile id="file" value="${revenueAllocationAdminMBean.revenueAllocationFile}"/>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h:outputText value=""/>
+                    </div>
+                    <div class="col-sm-5">
+                        <h:commandButton action="${revenueAllocationAdminMBean.updateRevenueAllocations()}" value="Submit" styleClass="btn btn-primary"/>
+                    </div>
+                </div>
+                
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
+

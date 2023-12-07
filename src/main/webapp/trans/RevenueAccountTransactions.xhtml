@@ -9,9 +9,63 @@
             <div class="w3-row-padding">
                 <div class="w3-col m12">
                     <div class="w3-card w3-round w3-white">
-                    <div class="w3-container w3-padding">
-                        <h4 class="w3-margin-left">Transactions Revenue Account</h4>
-                    </div>
+                        <div class="w3-container w3-padding">
+                            <h4 class="w3-margin-left">Revenue Account</h4>
+                            <div class="w3-row-padding" style="margin:0 -16px">
+                                <div class="w3-half">
+                                    Account Name 
+                                </div>
+                                <div class="w3-half">
+                                    #{revenueTransactionsMBean.revenueAccount.name}
+                                </div>
+                            </div>
+                            <div class="w3-row-padding" style="margin:0 -16px">
+                                <div class="w3-half">
+                                    YTD Balance 
+                                </div>
+                                <div class="w3-half">
+                                    #{revenueTransactionsMBean.revenueAccount.ytdBalance}
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="w3-container w3-padding">
+                            <h4 class="w3-margin-left"><b>Transactions</b></h4>
+                            <div class="w3-row-padding" style="margin:0 -16px">
+                                <div class="w3-quarter">
+                                    Dated 
+                                </div>
+                                <div class="w3-quarter">
+                                    Money In 
+                                </div>
+                                <div class="w3-quarter">
+                                    Money Out 
+                                </div>
+                                <div class="w3-quarter">
+                                    YTD Balance 
+                                </div>
+                            </div>
+                            <ui:repeat  value="#{revenueTransactionsMBean.revenueAccountTransactions}" var="revTrans">
+                                <div class="w3-row-padding" style="margin:0 -16px">
+                                    <div class="w3-quarter">
+                                        <h:outputText value="#{revTrans.createdOn}">
+                                            <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                        </h:outputText>
+
+                                    </div>
+                                    <div class="w3-quarter">
+                                        #{revTrans.moneyIn gt "0"?revTrans.moneyIn:"&#160;"}
+                                    </div>
+                                    <div class="w3-quarter">
+                                        #{revTrans.moneyOut gt "0"?revTrans.moneyOut:"&#160;"} 
+                                    </div>
+                                    <div class="w3-quarter">
+                                        #{revTrans.ytdBalance} 
+                                    </div>
+                                </div>
+
+                            </ui:repeat>    
+                        </div>
                     </div>
                 </div>
             </div>

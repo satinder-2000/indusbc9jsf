@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/adminTemplate.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <ui:define name="content">
+        <h2>Admin Login</h2>
+        <div class="container col-sm-8">
+            <h:form>
+            <div class="row">
+                <div class="col-sm-5">
+                    <h:outputLabel for="email" value="Email"></h:outputLabel>
+                </div>
+                <div class="col-sm-5">
+                    <h:inputText id="email" value="#{adminLoginMBean.email}"/>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-sm-5">
+                    <h:outputLabel for="password" value="Password"></h:outputLabel>
+                </div>
+                <div class="col-sm-5">
+                    <h:inputSecret id="password" value="#{adminLoginMBean.password}"/>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-sm-5">
+                    <h:outputText value=""/>
+                </div>
+                <div class="col-sm-5">
+                    <h:commandButton action="#{adminLoginMBean.adminLogin()}" value="Log In" styleClass="btn btn-primary"/>
+                </div>
+            </div>
+            </h:form>    
+            
+        </div>
+    </ui:define>
+
+</ui:composition>

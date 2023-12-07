@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/adminTemplate.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <ui:define name="content">
+        <div class="container col-sm-8">
+            <h2>Perform Allocations</h2>
+            <h:form enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h:outputLabel for="year" value="Year"/>
+                    </div>
+                    <div class="col-sm-5">
+                        <h:inputText id="year" value="${allocationsAdminMBean.year}"/>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h:outputLabel for="gran" value="Granularity"/>
+                    </div>
+                    <div class="col-sm-5">
+                        <h:inputText id="gran" value="${allocationsAdminMBean.granularity}"/>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h:outputLabel for="jobName" value="Job Name"/>
+                    </div>
+                    <div class="col-sm-5">
+                        <h:inputText id="jobName" value="${allocationsAdminMBean.allocationJobName}"/>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h:outputText value=""/>
+                    </div>
+                    <div class="col-sm-5">
+                        <h:commandButton action="${allocationsAdminMBean.startAllocation()}" value="Submit" styleClass="btn btn-primary"/>
+                    </div>
+                </div>
+                
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
+
+

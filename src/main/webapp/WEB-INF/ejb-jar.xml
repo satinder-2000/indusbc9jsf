@@ -4,18 +4,18 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/ejb-jar_4_0.xsd">
     
-    <!-- enterprise-beans>
+    <enterprise-beans>
         <session>
-            <display-name>EmailerEjb</display-name>
-            <ejb-name>EmailerEjb</ejb-name>
-            <ejb-class>org.indusbc.ejb.EmailerEjb</ejb-class>
+            <display-name>EmailService</display-name>
+            <ejb-name>EmailService</ejb-name>
+            <ejb-class>org.indusbc.ejbs.EmailEjb</ejb-class>
             <env-entry>
                 <env-entry-name>sender</env-entry-name>
                 <env-entry-type>java.lang.String</env-entry-type>
                 <env-entry-value>admin@indusbc.org</env-entry-value>
             </env-entry>
             <env-entry>
-                <env-entry-name>WebURI</env-entry-name>
+                <env-entry-name>webURI</env-entry-name>
                 <env-entry-type>java.lang.String</env-entry-type>
                 <env-entry-value>http://localhost:8080/indusbc9jsf/</env-entry-value>
             </env-entry>
@@ -24,7 +24,7 @@
             <env-entry>
                 <env-entry-name>accessCreateURI</env-entry-name>
                 <env-entry-type>java.lang.String</env-entry-type>
-                <env-entry-value>accessCreate.xhtml?email=</env-entry-value>
+                <env-entry-value>accessCreate.xhtml?email=%s&amp;accessType=%s</env-entry-value>
             </env-entry>
             
              <env-entry>
@@ -38,6 +38,6 @@
                 <env-entry-value>home/accessReset.xhtml</env-entry-value>
             </env-entry>
         </session>
-    </enterprise-beans -->
+    </enterprise-beans>
 
 </ejb-jar>

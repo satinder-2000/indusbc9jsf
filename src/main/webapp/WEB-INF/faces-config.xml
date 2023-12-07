@@ -17,13 +17,20 @@
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
-
+IL@ve2nu69
 -->
 <faces-config version="3.0"
               xmlns="https://jakarta.ee/xml/ns/jakartaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_3_0.xsd">
               
+    <navigation-rule>
+        <from-view-id>/trans/RevenueAccountTransactions.xhml</from-view-id>
+        <navigation-case>
+            <from-outcome>/LogoutConfirm</from-outcome>
+            <to-view-id>/LogoutConfirm.xhtml?faces-redirect=true</to-view-id>
+        </navigation-case>
+    </navigation-rule>
     <navigation-rule>
         <from-view-id>/home/ExpensePartyHome.xhtml</from-view-id>
         <navigation-case>

@@ -9,10 +9,18 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.flow.FlowScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.ServletContext;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -41,6 +49,7 @@ import org.indusbc.dtos.ExpensePartyDto;
 import org.indusbc.util.AccessType;
 import org.indusbc.util.FinancialYear;
 import org.indusbc.util.HashGenerator;
+import org.indusbc.ejbs.EmailEjbLocal;
 
 /**
  *
@@ -54,6 +63,15 @@ public class ExpensePartyRegisterMBean implements Serializable{
     private List<ProofOfIdDocument> proofOfIdDocList;
     private List<ExpenseCategory> expenseCategoryList;
     private ExpensePartyDto expensePartyDto;
+    
+    @Resource(name="mail/indusbc")
+    Session session;
+    
+    @Inject
+    EmailEjbLocal emailEjbLocal;
+
+    public ExpensePartyRegisterMBean() {
+    }
     
     
     @PostConstruct
@@ -150,8 +168,10 @@ public class ExpensePartyRegisterMBean implements Serializable{
         for (String expAcct : expensePartyDto.getExpenseAccounts()) {
             ExpenseAccount ea = new ExpenseAccount();
             ea.setName(expAcct);
+            ea.setExpenseCategory(expAcct);
             ea.setExpensePartyId(expensePartyIdResult.getInsertedId().asObjectId().getValue());
             ea.setExpenseAccountHash(HashGenerator.generateHash(expensePartyDto.getEmail() + expAcct));
+            ea.setYear(FinancialYear.financialYear());
             ea.setCreatedOn(new Date());
             ea.setYtdBalance("0");
             partyExpenseAccounts.add(ea);
@@ -167,7 +187,7 @@ public class ExpensePartyRegisterMBean implements Serializable{
         Access access = new Access();
         access.setEmail(expensePartyDto.getEmail());
         access.setPassword("");
-        access.setAccessType(AccessType.ExpenseParty.toString());
+        access.setAccessType(AccessType.EXPENSE_PARTY.getShortName());
         access.setPartyId(expensePartyIdResult.getInsertedId().asObjectId().getValue());
         access.setLastAccessedOn(new Date());
         access.setFailedAttempts(0);
@@ -175,8 +195,16 @@ public class ExpensePartyRegisterMBean implements Serializable{
         InsertOneResult accessIdResult = accessColl.insertOne(access);
         LOGGER.info(String.format("Access created with Id of %s", accessIdResult.getInsertedId()));
         //And finally send email to the Party
-        
-         
+        sendEmail(access);
+    }
+    
+    private void sendEmail(Access access){
+        try{
+            emailEjbLocal.sendEmail(access);
+            System.out.println("Email sent successfully!!");
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
     
     public String getReturnValue(){

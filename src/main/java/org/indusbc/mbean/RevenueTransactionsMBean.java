@@ -23,21 +23,20 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.indusbc.collections.ExpenseAccount;
-import org.indusbc.collections.ExpenseAccountTransaction;
+import org.indusbc.collections.RevenueAccount;
+import org.indusbc.collections.RevenueAccountTransaction;
 
 /**
  *
  * @author singh
  */
-@Named(value = "expenseTransactionsMBean")
+@Named(value = "revenueTransactionsMBean")
 @RequestScoped
-public class ExpenseTransactionsMBean {
+public class RevenueTransactionsMBean {
     
-    private static final Logger LOGGER = Logger.getLogger(ExpenseTransactionsMBean.class.getName());
-    
-    private ExpenseAccount expenseAccount;
-    private List<ExpenseAccountTransaction> expenseAccountTransactions;
+    private static final Logger LOGGER = Logger.getLogger(RevenueTransactionsMBean.class.getName());
+    private RevenueAccount revenueAccount;
+    private List<RevenueAccountTransaction> revenueAccountTransactions;
     
     @PostConstruct
     public void init(){
@@ -48,36 +47,37 @@ public class ExpenseTransactionsMBean {
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
         CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),fromProviders(pojoCodecProvider));
         MongoDatabase mongoDatabase=mongoClient.getDatabase(servletContext.getInitParameter("MONGODB_DB")).withCodecRegistry(pojoCodecRegistry);
-        MongoCollection<ExpenseAccount> expenseAcctColl = mongoDatabase.getCollection("ExpenseAccount", ExpenseAccount.class);
-        ObjectId expAcctId=new ObjectId(request.getParameter("accountId"));
-        Bson filter=Filters.eq("_id", expAcctId);
-        expenseAccount =expenseAcctColl.find(filter).first();
-        MongoCollection<ExpenseAccountTransaction> expenseAcctTxColl = mongoDatabase.getCollection("ExpenseAccountTransaction", ExpenseAccountTransaction.class);
-        Bson filterTx=Filters.eq("expenseAccountId", expAcctId);
-        Iterable<ExpenseAccountTransaction> expenseAcctTxItrable= expenseAcctTxColl.find(filterTx);
-        Iterator<ExpenseAccountTransaction> expenseAcctTxItr = expenseAcctTxItrable.iterator();
-        expenseAccountTransactions = new ArrayList<>();
-        while(expenseAcctTxItr.hasNext()){
-            expenseAccountTransactions.add(expenseAcctTxItr.next());
+        MongoCollection<RevenueAccount> revenueAcctColl = mongoDatabase.getCollection("RevenueAccount", RevenueAccount.class);
+        ObjectId revAcctId=new ObjectId(request.getParameter("accountId"));
+        Bson filter=Filters.eq("_id", revAcctId);
+        revenueAccount =revenueAcctColl.find(filter).first();
+        MongoCollection<RevenueAccountTransaction> revenueAcctTxColl = mongoDatabase.getCollection("RevenueAccountTransaction", RevenueAccountTransaction.class);
+        Bson filterTx=Filters.eq("revenueAccountId", revAcctId);
+        Iterable<RevenueAccountTransaction> revenueAcctTxItrable= revenueAcctTxColl.find(filterTx);
+        Iterator<RevenueAccountTransaction> revenueAcctTxItr = revenueAcctTxItrable.iterator();
+        revenueAccountTransactions = new ArrayList<>();
+        while(revenueAcctTxItr.hasNext()){
+            revenueAccountTransactions.add(revenueAcctTxItr.next());
         }
         
     }
 
-    public ExpenseAccount getExpenseAccount() {
-        return expenseAccount;
+    public RevenueAccount getRevenueAccount() {
+        return revenueAccount;
     }
 
-    public void setExpenseAccount(ExpenseAccount expenseAccount) {
-        this.expenseAccount = expenseAccount;
+    public void setRevenueAccount(RevenueAccount revenueAccount) {
+        this.revenueAccount = revenueAccount;
     }
 
-    public List<ExpenseAccountTransaction> getExpenseAccountTransactions() {
-        return expenseAccountTransactions;
+    public List<RevenueAccountTransaction> getRevenueAccountTransactions() {
+        return revenueAccountTransactions;
     }
 
-    public void setExpenseAccountTransactions(List<ExpenseAccountTransaction> expenseAccountTransactions) {
-        this.expenseAccountTransactions = expenseAccountTransactions;
+    public void setRevenueAccountTransactions(List<RevenueAccountTransaction> revenueAccountTransactions) {
+        this.revenueAccountTransactions = revenueAccountTransactions;
     }
+    
     
     
     

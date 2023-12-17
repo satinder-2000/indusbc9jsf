@@ -1,4 +1,4 @@
-YEAR,CATEGORY,PERCENT_ALLOCATION,ALLOCATION
+year,expenseCategory,percentAllocation,allocation
 2023,Pension,0.0527,52746.77837
 2023,Defence,0.0974,97391.5486
 2023,Subsidy- Fertiliser,0.0394,39409.45683

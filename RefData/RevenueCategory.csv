@@ -1,4 +1,4 @@
-YEAR,REVENUE_CATEGORY
+year,revenueCategory
 2023,Corporation Tax
 2023,Taxes on Income
 2023,Wealth Tax
@@ -17,3 +17,4 @@ YEAR,REVENUE_CATEGORY
 2023,Recoveries of loans  and advances
 2023,Disinvestment Receipts
 2023,Debt Receipts
+2023,Other Receipts

@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +41,6 @@ import org.indusbc.collections.ExpenseCategory;
 import org.indusbc.collections.RevenueAccount;
 import org.indusbc.collections.RevenueAllocation;
 import org.indusbc.collections.RevenueCategory;
-import org.indusbc.ejbs.AllocationEjbLocal;
 
 /**
  *
@@ -108,20 +108,21 @@ public class AllocationsAdminMBean implements Serializable {
         
         //Step 4: Before we proceed further we need to drop those RevenueCategories where there is no RevenueAllocation for the year
         List<RevenueCategory> revenueCategoryListClean = new ArrayList<>();
-        outer: for(RevenueCategory revCat : revenueCategoryList){
+        outer:
+        for (RevenueCategory revCat : revenueCategoryList) {
             for (RevenueAllocation ral : revenueAllocationList) {
-            if (revCat.getRevenueCategory().equals(ral.getRevenueCategory())) {
-                revenueCategoryListClean.add(revCat);
-                continue outer;
+                if (revCat.getRevenueCategory().equals(ral.getRevenueCategory())) {
+                    revenueCategoryListClean.add(revCat);
+                    continue outer;
+                }
             }
-        }
-            
+
         }
         
-        //HERE Step 5: Determine the count of RevenueAccount each RevenueCategory in revenueAllocationListClean
+        //Step 5: Determine the count of RevenueAccount each RevenueCategory in revenueAllocationListClean
         //Will be used to allocate the RevenueAllocation equally across the Accounts.
         Map<String, Integer> revenueAccountByCategoryMap=new HashMap<>();
-        for(RevenueCategory rc: revenueCategoryList){
+        for(RevenueCategory rc: revenueCategoryListClean){
             Integer accountCt=revenueAccountByCategoryMap.get(rc.getRevenueCategory());
             if (accountCt==null){
                 revenueAccountByCategoryMap.put(rc.getRevenueCategory(), 1);
@@ -158,8 +159,9 @@ public class AllocationsAdminMBean implements Serializable {
              LOGGER.info(String.format("RevenueAllocation category %s has %.2f allocation", revCat,revCatAllocValue));
          }
          
-         //And update the RevenueAccount ytdBalance
-         for (RevenueAllocation ralloc : revenueAllocationList) {
+         //Step6: Ascertain the ytdBalance for each RevenueAccount
+         //Step7: Go through the List of RevenueAccount (Step2) and populate each Account with ytdBalance from Step6
+         outer: for (RevenueAllocation ralloc : revenueAllocationList) {
             String revCat = ralloc.getRevenueCategory();
             BigDecimal revCatAlloc = revCatAllocMap.get(revCat);
             if (revCatAlloc.equals(new BigDecimal("0"))) {
@@ -168,26 +170,25 @@ public class AllocationsAdminMBean implements Serializable {
             } else {
                 BigDecimal revCatAllocPerAcct = revCatAlloc.divide(new BigDecimal(revenueAccountByCategoryMap.get(revCat)));
                 for (RevenueAccount ra : revenueAccountList) {
-                    if (ra.getName().equals(revCat)) {
+                    if (ra.getRevenueCategory().equals(revCat)) {
                         ra.setYtdBalance(revCatAllocPerAcct.toString());
+                        continue outer;
                     }
-                    //Bson filterRa = Filters.eq("_id", ra.getId());
-                    //revenueAccountColl.replaceOne(filterRa, ra);
                 }
             }
 
         }
          
         //Step 5 Lets load the merged RevenueAccount(s) to poputate CentralAccount(s)
-        revenueAccountColl = mongoDatabase.getCollection("RevenueAccount", RevenueAccount.class);
+        /*revenueAccountColl = mongoDatabase.getCollection("RevenueAccount", RevenueAccount.class);
         revenueAccountList = new ArrayList<>();
         revenueAccountItrable = revenueAccountColl.find(filter);
         revenueAccountItr = revenueAccountItrable.iterator();
         while (revenueAccountItr.hasNext()) {
             revenueAccountList.add(revenueAccountItr.next());
-        }
+        }*/
         
-        //Step6 CentralAccount Collection
+        //Step8: Since the RevenueAccount are populated, create CentralAccount records for granularity amount - take money from ytdBalance
         List<CentralAccount> centralAccountList=new ArrayList<>();
         for(RevenueAccount ra : revenueAccountList){
             while (new BigDecimal(ra.getYtdBalance()).compareTo(BigDecimal.ZERO)==1){
@@ -196,7 +197,7 @@ public class AllocationsAdminMBean implements Serializable {
                 ca.setRevenueAccountHash(ra.getRevenueAccountHash());
                 ca.setAmount(granularity);
                 ca.setAccountName(ra.getName() + " to ");
-                ca.setTransactionDate(LocalDateTime.now());
+                ca.setTransactionDate(new Date());
                 //Will set other fields such as Timestamp and Account Name (append Expense Account Name0 when we popuate the Expense records
                 ra.setYtdBalance(new BigDecimal(ra.getYtdBalance()).subtract(new BigDecimal(granularity)).toString());
                 centralAccountList.add(ca);
@@ -207,7 +208,7 @@ public class AllocationsAdminMBean implements Serializable {
         //LOGGER.info(String.format("Count of CentralAccounts created is %d", result.getInsertedIds().size()));
          
         //Dealing with the expense side now.
-        //Step7 Gather ExpenseCategory
+        //Step9: Load ExpenseCategory List. It will have certain categories that won't have ExpenseAllocation 
         MongoCollection<ExpenseCategory> expenseCategoryColl=mongoDatabase.getCollection("ExpenseCategory", ExpenseCategory.class);
         FindIterable<ExpenseCategory> expenseCategoryItrable= expenseCategoryColl.find(filter);
         List<ExpenseCategory> expenseCategoryList = new ArrayList<>();
@@ -217,17 +218,7 @@ public class AllocationsAdminMBean implements Serializable {
         }
         LOGGER.info(String.format("Count of ExpenseCategories is %d", expenseCategoryList.size()));
         
-        //Step8 Load ExpenseAllocation
-        MongoCollection<ExpenseAllocation> expenseAllocColl=mongoDatabase.getCollection("ExpenseAllocation", ExpenseAllocation.class);
-        FindIterable<ExpenseAllocation> expenseAllocationItrable=expenseAllocColl.find(filter);
-        List<ExpenseAllocation> expenseAllocationList=new ArrayList<>();
-        Iterator<ExpenseAllocation> expenseAllocationItr = expenseAllocationItrable.iterator();
-        while(expenseAllocationItr.hasNext()){
-            expenseAllocationList.add(expenseAllocationItr.next());
-        }
-        LOGGER.info(String.format("Count of ExpenseAllocation is %d", expenseAllocationList.size()));
-        
-        //Step9 Load ExpenseAccount
+        //Step10: Load ExpenseAccount. There won't be any ExpenseAccount where ExpenseAllocation has not been made.
         MongoCollection<ExpenseAccount> expenseAccountColl=mongoDatabase.getCollection("ExpenseAccount", ExpenseAccount.class);
         FindIterable<ExpenseAccount> expenseAccountItrable=expenseAccountColl.find(filter);
         List<ExpenseAccount> expenseAccountList=new ArrayList<>();
@@ -237,10 +228,34 @@ public class AllocationsAdminMBean implements Serializable {
         }
         LOGGER.info(String.format("Count of ExpenseAccounts is %d", expenseAccountList.size()));
         
-        //Step10 Number of ExpenseAccounts per ExpenseCategory
+        
+        //Step11: Load ExpenseAllocation. Won't have Allocation to all the ExpenseCategory
+        MongoCollection<ExpenseAllocation> expenseAllocColl=mongoDatabase.getCollection("ExpenseAllocation", ExpenseAllocation.class);
+        FindIterable<ExpenseAllocation> expenseAllocationItrable=expenseAllocColl.find(filter);
+        List<ExpenseAllocation> expenseAllocationList=new ArrayList<>();
+        Iterator<ExpenseAllocation> expenseAllocationItr = expenseAllocationItrable.iterator();
+        while(expenseAllocationItr.hasNext()){
+            expenseAllocationList.add(expenseAllocationItr.next());
+        }
+        LOGGER.info(String.format("Count of ExpenseAllocation is %d", expenseAllocationList.size()));
+        
+        //Step12: Copy the valid ExpenseCategory to expenseCategoryListClean
+        List<ExpenseCategory> expenseCategoryListClean = new ArrayList<>();
+        outer:
+        for (ExpenseCategory expCat : expenseCategoryList) {
+            for (ExpenseAllocation eal : expenseAllocationList) {
+                if (expCat.getExpenseCategory().equals(eal.getExpenseCategory())) {
+                    expenseCategoryListClean.add(expCat);
+                    continue outer;
+                }
+            }
+
+        }
+        
+        //Step13: Determine the count of ExpenseAccount each ExpenseCategory in expenseAllocationListClean
         Map<String, Integer> expenseAccountByCategoryMap=new HashMap<>();
-        for(ExpenseCategory ec: expenseCategoryList){
-            Integer accountCt=revenueAccountByCategoryMap.get(ec.getExpenseCategory());
+        for(ExpenseCategory ec: expenseCategoryListClean){
+            Integer accountCt=expenseAccountByCategoryMap.get(ec.getExpenseCategory());
             if (accountCt==null){
                 expenseAccountByCategoryMap.put(ec.getExpenseCategory(), 1);
             }else{
@@ -249,50 +264,60 @@ public class AllocationsAdminMBean implements Serializable {
         }
         
         //At this stage the expenseAccountByCategoryMap Map should be all populated. Let's print the values
-        Set<String> keysExpAcct = expenseAccountByCategoryMap.keySet();
-        Iterator<String> keysExpAcctItr = keysExpAcct.iterator();
-        while (keysExpAcctItr.hasNext()) {
-            String expCatStrKey = keysExpAcctItr.next();
-            LOGGER.info(String.format("ExpenseCategory %s has %d accounts", expCatStrKey, expenseAccountByCategoryMap.get(expCatStrKey)));
+        Set<String> expCatSet=expenseAccountByCategoryMap.keySet();
+        Iterator<String> expCatSetItr = expCatSet.iterator();
+        while(expCatSetItr.hasNext()){
+            String expCat = expCatSetItr.next();
+            LOGGER.info(String.format("Count of ExpenseCategory %s is %d", expCat, expenseAccountByCategoryMap.get(expCat)));
         }
         
-        //Step11 Hold allocation for ExpenseCategory
-        Map<String, BigDecimal> expCatAllocnsMap = new HashMap<>();
-        //Store the allocated amount for each ExpenseCategory
-        for(ExpenseAllocation eAloc : expenseAllocationList){
-            String expCatStr=eAloc.getExpenseCategory();
-            //Do we have mapping of this expCatStr in exp
-            BigDecimal expCatAlloc=expCatAllocnsMap.get(expCatStr);
-            if (expCatAlloc==null){
-                expCatAllocnsMap.put(expCatStr, new BigDecimal(eAloc.getAllocation()));
+        //Hold ExpenseAllocation for ExpenseCategory
+        Map<String, BigDecimal> expCatAllocMap = new HashMap<>();
+        for(ExpenseAllocation expAlloc : expenseAllocationList){
+            String expCat=expAlloc.getExpenseCategory();
+            //Do we have mapping of this recCat in expCatAllocMap?
+            BigDecimal expCatAllocation = expCatAllocMap.get(expCat);
+            if (expCatAllocation == null){
+                expCatAllocMap.put(expCat, new BigDecimal(expAlloc.getAllocation()));
             }
         }
-        //At this stage the expCatAllocs Map should be all populated. Let's print the values
-        Set<String> expKeysAlloc = expCatAllocnsMap.keySet();
-        Iterator<String> expKeysItrAlloc = expKeysAlloc.iterator();
-        while (expKeysItrAlloc.hasNext()) {
-            String expCatAllocStrKey = expKeysItrAlloc.next();
-            BigDecimal allocationVal=expCatAllocnsMap.get(expCatAllocStrKey);
-            LOGGER.info(String.format("ExpenseAllocation category %s has %.2f allocation", expCatAllocStrKey, allocationVal));
-        }
         
-        //And merge ExpenseAccount(s) with the DB
-        for (ExpenseAllocation eal : expenseAllocationList) {
-            String expCat = eal.getExpenseCategory();
-            BigDecimal expCatAlloc = expCatAllocnsMap.get(expCat);
-            BigDecimal expCatAllocPerAcct = expCatAlloc.divide(new BigDecimal(expenseAccountByCategoryMap.get(expCat)));
-            for (ExpenseAccount ea : expenseAccountList) {
-                if(ea.getName().equals(expCat)){
-                     ea.setYtdBalance(expCatAllocPerAcct.toString());
+        //At this stage the revCatAllocMap should be all populated. Let's print the values
+        Set<String> expCatAllocMapKeys=expCatAllocMap.keySet();
+        Iterator<String> expCatAllocMapKeysItr=expCatAllocMapKeys.iterator();
+        while(expCatAllocMapKeysItr.hasNext()){
+             String expCat=expCatAllocMapKeysItr.next();
+             BigDecimal expCatAllocValue = expCatAllocMap.get(expCat);
+             LOGGER.info(String.format("ExpenseAllocation category %s has %.2f allocation", expCat,expCatAllocValue));
+         }
+        
+        //Step14: Ascertain the ytdBalance for each ExpenseAccount
+        //Step15: Go through the List of ExpenseAccount (Step10) and populate each Account with ytdBalance from Step14
+        for (ExpenseAllocation ealloc : expenseAllocationList) {
+            String expCat = ealloc.getExpenseCategory();
+            BigDecimal expCatAlloc = expCatAllocMap.get(expCat);
+            if (expCatAlloc.equals(new BigDecimal("0"))) {
+                //No allocation made
+                //No allocation made
+            } else {
+                BigDecimal expCatAllocPerAcct = expCatAlloc.divide(new BigDecimal(expenseAccountByCategoryMap.get(expCat)));
+                for (ExpenseAccount ea : expenseAccountList) {
+                    if (ea.getExpenseCategory().equals(expCat)) {
+                        ea.setYtdBalance(expCatAllocPerAcct.toString());
+                    }
                 }
             }
-        }
-         //These CAs has full granularty amount populated.
-        List<CentralAccount> asIsAccountsToKeep = new ArrayList<>();
-        //If we split a CA into two because of granularty amount issue, we populate then in newCentralAccounts and mark the current CA for removal
+        } 
+        
+        //Step16: Since the ExpenseAccount are populated, update CentralAccount records for granularity amount - take money from ytdBalance of ExpenseAccount.
+        //Step17: The CentralAccount List originally prepared in Step8 will undergo changes in order to align the correct gross amounts under each valid ExpenseCategory
+        
+        //These CAs has full granularty amount populated.
+        List<CentralAccount> centralAccountsToKeep = new ArrayList<>();
+        //If we split a CA into two because of granularty amount issue, we populate then in centralAccountsNew and mark the current CA for removal
         List<CentralAccount> centralAccountsToRemove = new ArrayList<>();
         //All the new Central Accounts to be posted  - effectively created from centralAccountsToRemove.
-        List<CentralAccount> newCentralAccounts = new ArrayList<>();
+        List<CentralAccount> centralAccountsNew = new ArrayList<>();
         //Logic to pupulate each Central Account record by 10000 
         int counterForCentralAccount=0;
         CentralAccount centralAccountOnHold=null;   
@@ -301,9 +326,9 @@ public class AllocationsAdminMBean implements Serializable {
             inner : while(true && counterForCentralAccount< centralAccountList.size()){
                 if (centralAccountOnHold!=null){//Revenue related fields already have been populated
                    centralAccountOnHold.setExpenseAccountHash(ea.getExpenseAccountHash());
-                   centralAccountOnHold.setTransactionDate(LocalDateTime.now());
+                   centralAccountOnHold.setTransactionDate(new Date());
                    centralAccountOnHold.setAccountName(centralAccountOnHold.getAccountName().concat(ea.getName()));
-                   newCentralAccounts.add(centralAccountOnHold);
+                   centralAccountsNew.add(centralAccountOnHold);
                    centralAccountOnHold=null;
                    //counterForCentralAccount++;
                    continue inner;
@@ -313,11 +338,11 @@ public class AllocationsAdminMBean implements Serializable {
                 if (new BigDecimal(ea.getYtdBalance()).compareTo(new BigDecimal(granularity)) == 1)//EA YTD BAL > granurarity
                 {
                     ca.setExpenseAccountHash(ea.getExpenseAccountHash());
-                    ca.setTransactionDate(LocalDateTime.now());
+                    ca.setTransactionDate(new Date());
                     ca.setAmount(granularity);
                     ea.setYtdBalance(new BigDecimal(ea.getYtdBalance()).subtract(new BigDecimal(granularity)).toString());
                     ca.setAccountName(ca.getAccountName().concat(ea.getName()));
-                    asIsAccountsToKeep.add(ca);
+                    centralAccountsToKeep.add(ca);
                     counterForCentralAccount +=1 ;
                     continue inner;
                 } else if (new BigDecimal(ea.getYtdBalance()).compareTo(new BigDecimal(granularity)) == -1)//EA YTD BAL > granurarity
@@ -331,9 +356,9 @@ public class AllocationsAdminMBean implements Serializable {
                     caNew1.setYear(ca.getYear());
                     caNew1.setRevenueAccountHash(ca.getRevenueAccountHash());
                     caNew1.setExpenseAccountHash(ea.getExpenseAccountHash());
-                    caNew1.setTransactionDate(LocalDateTime.now());
+                    caNew1.setTransactionDate(new Date());
                     caNew1.setAmount(ea.getYtdBalance());
-                    newCentralAccounts.add(caNew1);
+                    centralAccountsNew.add(caNew1);
                     CentralAccount caNew2 = new CentralAccount();
                     caNew2.setAccountName(ca.getAccountName());//Expense side of name completed in next iteration.
                     caNew2.setYear(ca.getYear());
@@ -348,21 +373,21 @@ public class AllocationsAdminMBean implements Serializable {
             }
         }
         
+        //Step18: Merge RevenueAccount and ExpenseAccount. 
+        DeleteResult deleteResultRa=revenueAccountColl.deleteMany(filter);
+        LOGGER.info(String.format("Count of RevenueAccount deleted %d",deleteResultRa.getDeletedCount()));
+        InsertManyResult insertManyResultRa=revenueAccountColl.insertMany(revenueAccountList);
+        LOGGER.info(String.format("Count of RevenueAccount inserted %d",insertManyResultRa.getInsertedIds().size()));
+        DeleteResult deleteResultEa=expenseAccountColl.deleteMany(filter);
+        LOGGER.info(String.format("Count of ExpenseAccount deleted %d",deleteResultEa.getDeletedCount() ));
+        InsertManyResult insertManyResultEa=expenseAccountColl.insertMany(expenseAccountList);
+        LOGGER.info(String.format("Count of ExpenseAccount inserted %d",insertManyResultEa.getInsertedIds().size()));
+        
         
         //Merge(s) and Persist(s)
-        centralAccountColl.insertMany(asIsAccountsToKeep);
-        centralAccountColl.insertMany(newCentralAccounts);
-        /*for(CentralAccount ca: asIsAccountsToKeep){
-            centralAccountColl.insertMany(newCentralAccounts);
-            //centralAccountEjbLocal.saveAllocation(ca);
-        }
-        for(CentralAccount ca: centralAccountsToRemove){
-            centralAccountColl..d
-            centralAccountEjbLocal.removeCentralAccount(ca);
-        }
-        /*for(CentralAccount ca: newCentralAccounts){
-            centralAccountEjbLocal.createAllocation(ca);
-        }*/
+        centralAccountColl.insertMany(centralAccountsToKeep);
+        centralAccountColl.insertMany(centralAccountsNew);
+        
         return null;
     }
 

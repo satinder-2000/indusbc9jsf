@@ -9,9 +9,11 @@ Step8: Since the RevenueAccount are populated, create CentralAccount records for
 Step9: Load ExpenseCategory List. It will have certain categories that won't have ExpenseAllocation 
 Step10: Load ExpenseAccount. There won't be any ExpenseAccount where ExpenseAllocation has not been made.
 Step11: Load ExpenseAllocation. Won't have Allocation to all the ExpenseCategory
-Step12: Copy the valid ExpenseAllocation to expenseAllocationListClean
+Step12: Copy the valid ExpenseCategory to expenseCategoryListClean
 Step13: Determine the count of ExpenseAccount each ExpenseCategory in expenseAllocationListClean
 Step14: Ascertain the ytdBalance for each ExpenseAccount
 Step15: Go through the List of ExpenseAccount (Step10) and populate each Account with ytdBalance from Step14
 Step16: Since the ExpenseAccount are populated, update CentralAccount records for granularity amount - take money from ytdBalance of ExpenseAccount.
 Step17: The CentralAccount List originally prepared in Step8 will undergo changes in order to align the correct gross amounts under each valid ExpenseCategory
+Step18: Merge RevenueAccount and ExpenseAccount. 
+Step19: Insert CentralAccount

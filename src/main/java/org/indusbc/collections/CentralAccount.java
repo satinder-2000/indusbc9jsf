@@ -1,6 +1,6 @@
 package org.indusbc.collections;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import org.bson.types.ObjectId;
 
 /**
@@ -15,7 +15,7 @@ public class CentralAccount {
     private String revenueAccountHash;
     private String expenseAccountHash;
     private String amount;
-    private LocalDateTime transactionDate;
+    private Date transactionDate;
 
     public ObjectId getId() {
         return _id;
@@ -66,13 +66,15 @@ public class CentralAccount {
         this.amount = amount;
     }
 
-    public LocalDateTime getTransactionDate() {
+    public Date getTransactionDate() {
         return transactionDate;
     }
 
-    public void setTransactionDate(LocalDateTime transactionDate) {
+    public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
+
+    
     
     
     

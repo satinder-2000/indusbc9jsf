@@ -85,7 +85,7 @@ public class EmailEjb implements EmailEjbLocal {
                 .append(webURI).append(accessCreate)
                 .append("</a>");
         //htmlMsg.append("<p>"+accessCreate+"</p>");
-        htmlMsg.append("<p>Best Wishes, <br/>www.bjmbc.net Admin</p>");
+        htmlMsg.append("<p>Best Wishes, <br/>www.indusbc.org Admin</p>");
         htmlMsg.append("</body></html>");
         MimeBodyPart htmlPart = new MimeBodyPart();
         try {
